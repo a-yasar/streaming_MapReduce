@@ -44,6 +44,7 @@ class StateManager(threading.Thread):
 			f = open(state_path, 'w')
 			f.write('%s\n'%(str(self.in_mem_state[key])))
 			f.close
+		self._update_state()
 
 	def get_state(self, key):
 

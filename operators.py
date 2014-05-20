@@ -72,9 +72,8 @@ class Reducer(threading.Thread):
 		super(Reducer, self).join(timeout)
 
 	def _reduce_map(self):
-		with self.lock:
-			key, values, state = self.task_q.get()
-			return self.reducef(key, values, state)
+		key, values, state = self.task_q.get()
+		return self.reducef(key, values, state)
 
 
 

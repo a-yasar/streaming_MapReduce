@@ -56,8 +56,9 @@ def main(args):
 	
 		source.join()
 		mapper.join()
+		reducer.join()   
 		state_man.join()
-		reducer.join()   	
+	
 
 if __name__ == "__main__":
 	import sys
