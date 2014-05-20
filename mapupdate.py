@@ -19,7 +19,6 @@ def parse_arguments(args):
 def prepare_taskfile(taskfile):
 	path = os.path.dirname(taskfile)
 	taskmodulename = os.path.splitext(os.path.basename(taskfile))[0]
-	logging.info("Loading task file %s from %s", taskmodulename, path)
 	fp, pathname, description = imp.find_module(taskmodulename, [path])
 
 	try:
@@ -37,12 +36,13 @@ def main(args):
 		taskmodule = prepare_taskfile(taskfile)
 		line_q = Queue.Queue()
 		map_q = Queue.Queue()
+		reduce_q = Queue.Queue()
 		update_q = Queue.Queue()
 
 		source = Source(filename, line_q = line_q)
 		mapper = Mapper(taskmodule.mapf, line_q, map_q)
-		state_man = StateManager(3, update_q)
-		reducer = Reducer(taskmodule.reducef, state_man, map_q, update_q)
+		state_man = StateManager(3, map_q, reduce_q, update_q)
+		reducer = Reducer(taskmodule.reducef, reduce_q, update_q)
 
 		source.daemon = True
 		mapper.daemon = True

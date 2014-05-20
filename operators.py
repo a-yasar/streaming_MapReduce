@@ -50,10 +50,9 @@ class Mapper(threading.Thread):
 		return self.mapf(self.task_q.get());
 
 class Reducer(threading.Thread):
-	def __init__(self, reducef, state_man, task_q, update_q):
+	def __init__(self, reducef, task_q, update_q):
 		super(Reducer, self).__init__()
 		self.reducef = reducef
-		self.state_man = state_man
 		self.task_q = task_q
 		self.update_q = update_q
 		self.stoprequest = threading.Event()
@@ -74,8 +73,8 @@ class Reducer(threading.Thread):
 
 	def _reduce_map(self):
 		with self.lock:
-			key, values = self.task_q.get()
-			return self.reducef(key, values, self.state_man.get_state(key))
+			key, values, state = self.task_q.get()
+			return self.reducef(key, values, state)
 
 
 

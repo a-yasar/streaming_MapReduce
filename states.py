@@ -1,3 +1,4 @@
+from sets import Set
 import os, time, sys
 import threading, Queue
 import os
@@ -5,19 +6,32 @@ import os
 DEFAULT_TIMEOUT = 5
 
 class StateManager(threading.Thread):
-	def __init__(self, mem_limit, update_q ):
+	def __init__(self, mem_limit, map_q, reduce_q, update_q ):
 		super(StateManager, self).__init__()
 		self.mem_limit = mem_limit
 		self.update_q = update_q
 		self.stoprequest = threading.Event()
 		self.in_mem_state = {}
+		self.processing_keys = Set()
+		self.map_q = map_q
+		self.reduce_q = reduce_q
 		self.lock = threading.Lock()
 
 	def run(self):
 		while not self.stoprequest.set():
 			try:
-				if not self.update_q.empty():
+				with self.lock:
+					key, value = self.map_q.get()
+					if key in self.processing_keys:
+						self.map_q.put((key,value))
+					else:
+						self.processing_keys.add(key)
+						state = self.get_state(key)
+						self.reduce_q.put((key, value, state))
 					self._update_state()
+
+					if not self.update_q.empty():
+						self._update_state()
 
 			except Queue.Empty:
 				continue
@@ -32,8 +46,6 @@ class StateManager(threading.Thread):
 			f.close
 
 	def get_state(self, key):
-		while self.lock.locked():
-			pass
 
 		if key in self.in_mem_state:
 			return self.in_mem_state[key]
@@ -47,16 +59,16 @@ class StateManager(threading.Thread):
 		return None
 
 	def _update_state(self):
-		with self.lock:
-			for i in xrange(self.update_q.qsize()):
-				(key, state) = self.update_q.get()
-				if key in self.in_mem_state:
-					self.in_mem_state[key] = state
-				elif not key in self.in_mem_state and len(self.in_mem_state) < self.mem_limit:
-					self.in_mem_state[key] = state
-				else:
-					state_path = './states/%s'%(key)
-					f = open(state_path, 'w')
-					f.write('%s\n'%(str(state)))
-					f.close
+		for i in xrange(self.update_q.qsize()):
+			(key, state) = self.update_q.get()
+			if key in self.in_mem_state:
+				self.in_mem_state[key] = state
+			elif not key in self.in_mem_state and len(self.in_mem_state) < self.mem_limit:
+				self.in_mem_state[key] = state
+			else:
+				state_path = './states/%s'%(key)
+				f = open(state_path, 'w')
+				f.write('%s\n'%(str(state)))
+				f.close
+			self.processing_keys.remove(key)
 					
