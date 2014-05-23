@@ -20,18 +20,16 @@ class StateManager(threading.Thread):
 	def run(self):
 		while not self.stoprequest.set():
 			try:
-				with self.lock:
-					key, value = self.map_q.get()
-					if key in self.processing_keys:
-						self.map_q.put((key,value))
-					else:
-						self.processing_keys.add(key)
-						state = self.get_state(key)
-						self.reduce_q.put((key, value, state))
-					self._update_state()
+				key, value = self.map_q.get()
+				if key in self.processing_keys:
+					self.map_q.put((key,value))
+				else:
+					self.processing_keys.add(key)
+					state = self.get_state(key)
+					self.reduce_q.put((key, value, state))
 
-					if not self.update_q.empty():
-						self._update_state()
+				if not self.update_q.empty():
+					self._update_state()
 
 			except Queue.Empty:
 				continue

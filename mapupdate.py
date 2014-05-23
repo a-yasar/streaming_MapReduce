@@ -56,7 +56,7 @@ def main(args):
 	
 		source.join()
 		mapper.join()
-		reducer.join()   
+		reducer.join()
 		state_man.join()
 	
 
