@@ -47,17 +47,16 @@ class StateManager(threading.Thread):
 	def join(self, timeout=DEFAULT_TIMEOUT):
 		self.stoprequest.set()
 		super(StateManager, self).join(timeout)
-		for key in self.in_mem_state:
-			state_path = './states/%s'%(key)
-			f = open(state_path, 'w')
-			f.write('%s\n'%(str(self.in_mem_state[key])))
-			f.close
 		self._update_state()
 
+		for k,v in self.in_mem_state.iteritems():
+			state_path = './states/%s'%(k)
+			f = open(state_path, 'w')
+			f.write('%s\n'%(str(v.state)))
+			f.close
+
 	def get_state(self, key):
-		"""
-			return current state of a given key
-		"""
+		#	return current state of a given key
 		if key in self.in_mem_state:
 			return self.in_mem_state[key].state
 		else:
@@ -80,7 +79,7 @@ class StateManager(threading.Thread):
 			#if in the memory update it
 			if key in self.in_mem_state:
 				s = self.in_mem_state[key] 
-				s._replace(state = state, freq = s.freq + 1)
+				s = s._replace(state = state, freq = s.freq + 1)
 				self.in_mem_state[key] = s
 			#if there is space put it	
 			elif not key in self.in_mem_state and len(self.in_mem_state) < self.mem_limit:

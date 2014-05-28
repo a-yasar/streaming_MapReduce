@@ -14,7 +14,7 @@ class Source(threading.Thread):
 		while not self.stoprequest.set():
 			try:
 				self.line_q.put(self._next_line())
-				time.sleep(1)		
+				time.sleep(0.1)		
 			except Queue.Empty:
 				continue
 
@@ -41,7 +41,6 @@ class Mapper(threading.Thread):
 			try:				
 				for item in self._map_line():
 					self.map_q.put(item)	
-				time.sleep(1)				
 			except Queue.Empty:
 				continue
 

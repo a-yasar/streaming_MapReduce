@@ -44,7 +44,7 @@ def main(args):
 
 		source = Source(filename, line_q = line_q)
 		mapper = Mapper(taskmodule.mapf, line_q, map_q)
-		state_man = StateManager(3, map_q, reduce_q, update_q)
+		state_man = StateManager(100, map_q, reduce_q, update_q)
 		reducer = Reducer(taskmodule.reducef, reduce_q, update_q)
 
 		source.daemon = True
@@ -60,8 +60,7 @@ def main(args):
 		source.join()
 		mapper.join()
 		reducer.join()
-		state_man.join()
-	
+		state_man.join()	
 
 if __name__ == "__main__":
 	import sys
