@@ -1,5 +1,3 @@
-#!/usr/bin/env/python
-
 from optparse import OptionParser
 from operators import Source, Mapper, Reducer
 from states import StateManager
@@ -30,11 +28,10 @@ def prepare_taskfile(taskfile):
 			fp.close()
 
 
-def main(args):
-	"""
-		It takes user defined functions, prepares queues and
-		and runs tasks.
-	"""
+def main(args):	
+	#	It takes user defined functions, prepares queues and
+	#	and runs tasks.
+	
     taskfile, filename = parse_arguments(args)
     if not taskfile or not filename:
     	return

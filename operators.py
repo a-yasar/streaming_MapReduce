@@ -1,5 +1,3 @@
-#!/usr/bin/env/python
-
 import os, time, sys
 import threading, Queue
 
@@ -28,11 +26,9 @@ class Source(threading.Thread):
 		return self.file.readline()	
 
 class Mapper(threading.Thread):
-	"""
-		Mapper operator. Read data and update mapper queue. 
-		It runs in a streaming manner. For now it simulates
-		stream of data.
-	"""
+	#	Mapper operator. Read data and update mapper queue. 
+	#	It runs in a streaming manner. For now it simulates
+	#	stream of data.
 	def __init__(self, mapf, task_q, map_q):
 		super(Mapper, self).__init__()
 		self.mapf = mapf
@@ -56,10 +52,8 @@ class Mapper(threading.Thread):
 	def _map_line(self):
 		return self.mapf(self.task_q.get());
 
-class Reducer(threading.Thread):
-	"""
-		Reducer operator.
-	"""
+class Reducer(threading.Thread):	
+	#	Reducer operator.
 	def __init__(self, reducef, task_q, update_q):
 		super(Reducer, self).__init__()
 		self.reducef = reducef

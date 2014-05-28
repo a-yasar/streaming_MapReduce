@@ -1,5 +1,3 @@
-#!/usr/bin/env/python
-
 from collections import namedtuple
 from sets import Set
 import os, time, sys
@@ -11,10 +9,8 @@ DEFAULT_TIMEOUT = 5
 FreqStruct = namedtuple("freqStruct", "state freq delta")
 
 class StateManager(threading.Thread):
-	"""
-		It takes updates from mapper and reducer, and keeps
-		tracks of the states. 
-	"""
+	#	It takes updates from mapper and reducer, and keeps
+	#	tracks of the states. 
 	def __init__(self, mem_limit, map_q, reduce_q, update_q ):
 		super(StateManager, self).__init__()
 		self.mem_limit = mem_limit
@@ -29,11 +25,9 @@ class StateManager(threading.Thread):
 		self.lock = threading.Lock()
 
 	def run(self):
-		"""
-			Main executor of StateManager which
-			Takes items, processes them and 
-			updates current states
-		"""
+		#	Main executor of StateManager which
+		#	Takes items, processes them and 
+		#	updates current states
 		while not self.stoprequest.set():
 			try:
 				key, value = self.map_q.get()
@@ -76,12 +70,10 @@ class StateManager(threading.Thread):
 		return None
 
 	def _update_state(self):
-		"""
-			Updates values of states and manages storage of 
-			states. It uses lossy frequency counting algorithm.
-			When a bucket is full, manager checks the memory and 
-			flushes infrequent items to the disk.
-		"""
+		# 	Updates values of states and manages storage of 
+		#	states. It uses lossy frequency counting algorithm.
+		#	When a bucket is full, manager checks the memory and 
+		#	flushes infrequent items to the disk.
 		for i in xrange(self.update_q.qsize()):
 			(key, state) = self.update_q.get()
 			self.numOfItemProcessed += 1
